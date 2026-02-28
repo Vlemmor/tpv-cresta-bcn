@@ -134,17 +134,14 @@ button {
 .view-section {
     position: absolute;
     inset: 0;
-    display: flex;
+    display: none;
     flex-direction: column;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
     background: var(--bg-color);
+    overflow-y: auto;
 }
 
 .view-section.active {
-    opacity: 1;
-    pointer-events: all;
+    display: flex;
     z-index: 5;
 }
 
@@ -598,19 +595,15 @@ button {
     position: fixed;
     inset: 0;
     background: rgba(15, 23, 42, 0.5);
-    display: flex;
+    display: none;
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s;
     backdrop-filter: blur(4px);
 }
 
 .modal-overlay.active {
-    opacity: 1;
-    pointer-events: all;
+    display: flex;
 }
 
 .modal-box {
