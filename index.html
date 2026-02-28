@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>La Cresta BCN - TPV System</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Chart.js and SheetJS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+
+    <!-- Tabler Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- CUSTOM MODAL COMPONENT -->
+    <div class="modal-overlay" id="custom-modal">
+        <div class="modal-box">
+            <i class="ti ti-check modal-icon success" id="modal-icon"></i>
+            <h3 class="modal-title" id="modal-title">Título</h3>
+            <p class="modal-msg" id="modal-msg">Mensaje descriptivo</p>
+            <div class="modal-actions" id="modal-actions">
+                <!-- Botones inyectados por JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- APP WRAPPER -->
+    <div class="app-container">
+
+        <!-- HEADER / TOP NAV -->
+        <header class="app-header no-print">
+            <div class="logo-container" onclick="app.goHome()" style="cursor: pointer;">
+                <h2>La Cresta BCN</h2>
+            </div>
+            <div class="header-actions">
+                <span id="current-time">00:00</span>
+                <nav class="desktop-nav">
+                    <button class="nav-btn" data-view="home-view"><i class="ti ti-home"></i> Inicio</button>
+                    <button class="nav-btn" data-view="tpv-view"><i class="ti ti-calculator"></i> TPV</button>
+                    <button class="nav-btn" data-view="dashboard-view"><i class="ti ti-chart-bar"></i>
+                        Administración</button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="main-content">
+
+            <!-- ====== VISTA 0: INICIO (HOME) ====== -->
+            <section id="home-view" class="view-section active">
+                <div class="home-options">
+
+                    <button class="home-btn" onclick="app.createNewQuickOrder()">
+                        <i class="ti ti-bolt"></i>
+                        Orden Rápida
+                        <p>Crear nuevo pedido para llevar o de pasada</p>
+                    </button>
+
+                    <button class="home-btn" onclick="app.switchView('tables-view')">
+                        <i class="ti ti-armchair"></i>
+                        Órdenes de Sala
+                        <p>Mesas y estado de cuenta actual</p>
+                    </button>
+
+                </div>
+            </section>
+
+            <!-- ====== VISTA 0.5: MESAS ====== -->
+            <section id="tables-view" class="view-section">
+                <div class="tables-header no-print">
+                    <button class="action-btn" onclick="app.goHome()"
+                        style="border: 1px solid var(--divider); background: var(--bg-color); border-radius: 8px;"><i
+                            class="ti ti-arrow-left"></i> Inicio</button>
+                    <h2>Estado del Local</h2>
+                    <button class="action-btn btn-pay" onclick="app.createNewQuickOrder()"
+                        style="border-radius: 8px; padding: 10px 15px;"><i class="ti ti-plus"></i> Rápida</button>
+                </div>
+
+                <div class="tables-container">
+                    <h3><i class="ti ti-bolt"></i> Órdenes Rápidas / Barra</h3>
+                    <div class="tables-grid" id="quick-orders-grid" style="margin-bottom: 2rem;">
+                        <!-- Generado por JS -->
+                    </div>
+
+                    <h3><i class="ti ti-armchair"></i> Mesas de Sala</h3>
+                    <div class="tables-grid" id="tables-grid">
+                        <!-- Generado por JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ====== VISTA 1: TPV (OPERADOR) ====== -->
+            <section id="tpv-view" class="view-section">
+
+                <!-- Columna Izquierda: Productos -->
+                <div class="menu-catalog-area no-print">
+
+                    <div class="products-grid" id="products-container">
+                        <!-- Productos generados por JS -->
+                    </div>
+
+                    <!-- Categorías abajo para no regresar -->
+                    <div class="categories-scroll" id="categories-container">
+                        <!-- Categorías generadas por JS -->
+                    </div>
+
+                </div>
+
+                <!-- Columna Derecha: Ticket / Mesa Activa -->
+                <aside class="order-area">
+                    <div class="order-header no-print">
+                        <button class="action-btn" onclick="app.saveOrderState()"
+                            style="background: var(--surface-color); border: 1px solid var(--divider); padding: 8px; border-radius: 6px;"><i
+                                class="ti ti-arrow-left"></i> Áreas</button>
+                        <span id="current-table-label">Mesa ---</span>
+                        <button class="clear-order-btn" onclick="app.clearCurrentOrder()" title="Limpiar Pedido"><i
+                                class="ti ti-trash"></i></button>
+                    </div>
+
+                    <!-- El ticket que se imprimirá -->
+                    <div class="ticket-container" id="printable-ticket">
+                        <div class="ticket-header print-only">
+                            <h2 class="print-logo">La Cresta BCN</h2>
+                            <p class="print-info">Ticket de Venta</p>
+                            <p class="print-info">ID: <span id="print-ticket-id">---</span></p>
+                            <p class="print-info">Fecha: <span id="print-date">---</span></p>
+                            <p class="print-info">Sala: <span id="print-table">---</span></p>
+                            <hr class="print-divider">
+                        </div>
+
+                        <div class="order-items-list" id="order-items">
+                            <!-- Items de la mesa generados por JS -->
+                        </div>
+
+                        <div class="order-summary">
+                            <hr class="print-divider print-only">
+                            <div class="summary-row text-muted">
+                                <span>Subtotal (Base)</span>
+                                <span id="summary-subtotal">€0.00</span>
+                            </div>
+                            <div class="summary-row text-muted">
+                                <span>IVA (10%)</span>
+                                <span id="summary-tax">€0.00</span>
+                            </div>
+                            <div class="summary-row total-row">
+                                <span>Total</span>
+                                <span id="summary-total">€0.00</span>
+                            </div>
+                        </div>
+
+                        <div class="ticket-footer print-only">
+                            <p>¡Gracias por su visita!</p>
+                            <p>Desarrollado con ♥ por TPV System</p>
+                        </div>
+                    </div>
+
+                    <div class="order-actions no-print">
+                        <button class="action-btn btn-save" onclick="app.saveOrderState()"><i
+                                class="ti ti-device-floppy"></i> Guardar Mesero</button>
+                        <button class="action-btn btn-print" onclick="app.printTicket()"><i class="ti ti-printer"></i>
+                            Pre-cuenta</button>
+                    </div>
+                    <!-- Botón de cobro final grande y separado -->
+                    <div class="order-actions full no-print" style="padding-top: 0;">
+                        <button class="action-btn btn-pay" onclick="app.checkoutTable()"><i class="ti ti-cash"></i>
+                            Cobrar y Cerrar Pedido</button>
+                    </div>
+
+                </aside>
+            </section>
+
+            <!-- ====== VISTA 2: DASHBOARD (ADMIN) ====== -->
+            <section id="dashboard-view" class="view-section">
+                <!-- Mantener dashboard igual... -->
+                <div class="dashboard-header no-print">
+                    <div class="dashboard-title">
+                        <h2>Panel Analítico</h2>
+                        <p>Visión general de ventas y operaciones</p>
+                    </div>
+
+                    <div class="dashboard-controls">
+                        <div class="filter-group">
+                            <label><i class="ti ti-calendar"></i> Rango</label>
+                            <select id="date-filter">
+                                <option value="today">Hoy</option>
+                                <option value="week">Esta semana</option>
+                                <option value="month">Este mes</option>
+                                <option value="all">Historico Completo</option>
+                            </select>
+                        </div>
+                        <button class="action-btn btn-export" onclick="admin.exportExcel()"><i
+                                class="ti ti-file-spreadsheet"></i> Exportar a Excel</button>
+                        <button class="action-btn btn-backup" onclick="admin.downloadBackup()"><i
+                                class="ti ti-download"></i> Backup JSON</button>
+                    </div>
+                </div>
+
+                <div class="kpi-grid no-print">
+                    <div class="kpi-card">
+                        <div class="kpi-icon bg-blue"><i class="ti ti-receipt"></i></div>
+                        <div class="kpi-data">
+                            <h3>Ventas Totales</h3>
+                            <p id="kpi-total-sales">€0.00</p>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon bg-green"><i class="ti ti-users"></i></div>
+                        <div class="kpi-data">
+                            <h3>N° Pedidos / Mesas</h3>
+                            <p id="kpi-total-tables">0</p>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon bg-purple"><i class="ti ti-ticket"></i></div>
+                        <div class="kpi-data">
+                            <h3>Ticket Promedio</h3>
+                            <p id="kpi-avg-ticket">€0.00</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="charts-grid no-print">
+                    <div class="chart-card">
+                        <h3>Platos Más Vendidos</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="top-products-chart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <h3>Ventas en el Tiempo</h3>
+                        <div class="chart-wrapper">
+                            <canvas id="sales-timeline-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- BOTTOM NAV (Mobile Only) -->
+        <nav class="mobile-nav no-print">
+            <button class="mobile-nav-btn" data-view="home-view">
+                <i class="ti ti-home"></i>
+                <span>Inicio</span>
+            </button>
+            <button class="mobile-nav-btn active" data-view="tpv-view">
+                <i class="ti ti-calculator"></i>
+                <span>TPV</span>
+            </button>
+            <button class="mobile-nav-btn" data-view="dashboard-view">
+                <i class="ti ti-chart-bar"></i>
+                <span>Admin</span>
+            </button>
+        </nav>
+
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="menu_data.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
