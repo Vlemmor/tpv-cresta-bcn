@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderCategories();
     renderProducts();
     app.renderTablesView();
+    setupDrawerSwipe(); // Enable swipe gestures on the order drawer
 
     // 5. Setup Listeners
     document.getElementById('date-filter').addEventListener('change', () => {
@@ -115,6 +116,22 @@ function openOrderDrawer() {
 function closeOrderDrawer() {
     const orderArea = document.getElementById('order-area');
     if (orderArea) orderArea.classList.remove('expanded');
+}
+
+function setupDrawerSwipe() {
+    const orderArea = document.getElementById('order-area');
+    if (!orderArea) return;
+    let touchStartY = 0;
+
+    orderArea.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    orderArea.addEventListener('touchend', (e) => {
+        const deltaY = touchStartY - e.changedTouches[0].clientY;
+        if (deltaY > 50) openOrderDrawer();       // swipe up = open
+        else if (deltaY < -50) closeOrderDrawer(); // swipe down = close
+    }, { passive: true });
 }
 
 function toggleCategories() {

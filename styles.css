@@ -297,21 +297,24 @@ button {
 .products-grid {
     flex: 1;
     overflow-y: auto;
-    padding: 1.5rem;
+    padding: 1rem 1.5rem;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 1rem;
     align-content: start;
     order: 1;
-    /* Arriba */
+    /* AFTER categories */
+    /* Extra bottom padding so last product is above the collapsed drawer */
+    padding-bottom: 80px;
 }
 
 /* Categorías en la parte inferior de la grilla de productos */
 .categories-wrapper {
     background: var(--surface-color);
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
-    border-top: var(--glass-border);
-    order: 2;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    border-bottom: var(--glass-border);
+    order: 0;
+    /* FIRST: above products */
     z-index: 5;
     flex-shrink: 0;
 }
@@ -331,11 +334,12 @@ button {
     cursor: pointer;
 }
 
-.categories-toggle i {
+.categories-toggle i.ti-chevron-up {
     transition: transform 0.2s;
 }
 
-.categories-toggle.collapsed i {
+/* When collapsed, the arrow flips down */
+.categories-toggle.collapsed i.ti-chevron-up {
     transform: rotate(180deg);
 }
 
