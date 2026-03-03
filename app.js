@@ -322,7 +322,6 @@ const app = {
         }
 
         const totals = app.calcTotals(cart);
-        // Build final ticket object
         const sale = {
             id: `T-${Math.floor(new Date().getTime() / 1000).toString().slice(-6)}`,
             timestamp: new Date().toISOString(),
@@ -332,25 +331,42 @@ const app = {
             })),
             taxRate: AppState.taxRate,
             subtotal: totals.subtotal,
-            tax: totals.tax, // Used 'tax' to match Google Apps Script
+            tax: totals.tax,
             total: totals.total
         };
 
-        // Custom Modal for Checkout Confirmation
         CustomModal.show({
             title: `Cobrar €${sale.total.toFixed(2)}`,
-            message: `Vas a cerrar la orden actual. Puedes imprimir el ticket ahora o solo cobrar y guardar en historial.`,
+            message: `Vas a cerrar la orden actual. Puedes imprimir el ticket ahora o solo cobrar.`,
             iconType: 'success',
             buttons: [
                 { text: 'Cancelar', class: 'modal-btn-secondary' },
                 {
-                    text: 'Solo Cobrar', class: 'modal-btn-secondary', onClick: async () => {
-                        await attemptSaveAndReset(sale, false);
+                    text: 'Solo Cobrar', class: 'modal-btn-secondary', onClick: () => {
+                        finalizeCheckout(sale);
                     }
                 },
                 {
-                    text: 'Cobrar e Imprimir', class: 'modal-btn-primary success', onClick: async () => {
-                        await attemptSaveAndReset(sale, true);
+                    text: 'Cobrar e Imprimir', class: 'modal-btn-primary success', onClick: () => {
+                        // PRINT FIRST (ticket still visible in DOM)
+                        window.print();
+                        // Ask for copy BEFORE clearing, then finalize
+                        setTimeout(() => {
+                            CustomModal.show({
+                                title: '¿Copia adicional?',
+                                message: '¿Deseas imprimir una copia del ticket?',
+                                iconType: 'warning',
+                                buttons: [
+                                    { text: 'No, gracias', class: 'modal-btn-secondary', onClick: () => finalizeCheckout(sale) },
+                                    {
+                                        text: 'Imprimir copia', class: 'modal-btn-primary', onClick: () => {
+                                            window.print();
+                                            setTimeout(() => finalizeCheckout(sale), 400);
+                                        }
+                                    }
+                                ]
+                            });
+                        }, 500);
                     }
                 }
             ]
@@ -376,37 +392,16 @@ const app = {
     }
 };
 
-async function attemptSaveAndReset(sale, doPrint) {
-    // 1. Act IMMEDIATELY - don't block UI waiting for network
-    AppState.orders[sale.tableId] = [];  // Clear cart NOW
-    AppState.activeTable = null;          // Unset active table
+// Finalize after printing (or for "Solo Cobrar" — no print)
+function finalizeCheckout(sale) {
+    AppState.orders[sale.tableId] = [];
+    AppState.activeTable = null;
     closeOrderDrawer();
     app.switchView('tables-view');
     app.renderTablesView();
-
-    // 2. Handle printing
-    if (doPrint) {
-        window.print();
-        // After print dialog closes, ask for additional copy
-        setTimeout(() => {
-            CustomModal.show({
-                title: '¿Copia adicional?',
-                message: '¿Deseas imprimir una copia del ticket?',
-                iconType: 'warning',
-                buttons: [
-                    { text: 'No, gracias', class: 'modal-btn-secondary' },
-                    { text: 'Imprimir copia', class: 'modal-btn-primary', onClick: () => window.print() }
-                ]
-            });
-        }, 600);
-    } else {
-        CustomModal.show({ title: 'Cobro Exitoso', message: 'La venta fue registrada.', iconType: 'success', buttons: [{ text: 'Ok', class: 'modal-btn-primary' }] });
-    }
-
-    // 3. Save to Google Sheets silently in the background
-    dbManager.saveSale(sale).catch(e => {
-        console.warn('Error saving to Google Sheets (background):', e);
-    });
+    CustomModal.show({ title: 'Cobro Exitoso', message: 'La venta fue registrada.', iconType: 'success', buttons: [{ text: 'Ok', class: 'modal-btn-primary' }] });
+    // Save to Google Sheets silently in background
+    dbManager.saveSale(sale).catch(e => console.warn('Error saving to Google Sheets:', e));
 }
 
 
@@ -470,20 +465,25 @@ function renderCart() {
     cart.forEach(item => {
         const div = document.createElement('div');
         div.className = 'cart-item';
+        const lineTotal = (item.product.price * item.qty).toFixed(2);
         div.innerHTML = `
-            <div class="item-qty-controls">
+            <div class="item-qty-controls no-print">
                 <button class="qty-btn" onclick="app.updateQty(${item.product.id}, -1)">-</button>
                 <div class="item-qty">${item.qty}</div>
                 <button class="qty-btn" onclick="app.updateQty(${item.product.id}, 1)">+</button>
             </div>
-            <div class="item-info">
+            <div class="item-info no-print">
                 <div class="item-title">${item.product.name}</div>
-                <div class="item-price">€${(item.product.price * item.qty).toFixed(2)}</div>
+                <div class="item-price">€${lineTotal}</div>
             </div>
-            <div class="print-only">${item.qty}x - €${(item.product.price * item.qty).toFixed(2)}</div>
+            <div class="print-only print-item-row">
+                <span class="print-item-name">${item.qty}x ${item.product.name}</span>
+                <span class="print-item-price">€${lineTotal}</span>
+            </div>
         `;
         list.appendChild(div);
     });
+
 
     const totals = app.calcTotals(cart);
     document.getElementById('summary-subtotal').innerText = `€${totals.subtotal.toFixed(2)}`;
