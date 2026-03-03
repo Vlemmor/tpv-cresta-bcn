@@ -304,8 +304,8 @@ button {
     align-content: start;
     order: 1;
     /* AFTER categories */
-    /* Extra bottom padding so last product is above the collapsed drawer */
-    padding-bottom: 80px;
+    /* Enough bottom padding so last cards are fully visible above the fixed drawer */
+    padding-bottom: 150px;
 }
 
 /* Categorías en la parte inferior de la grilla de productos */

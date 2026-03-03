@@ -377,22 +377,38 @@ const app = {
 };
 
 async function attemptSaveAndReset(sale, doPrint) {
-    try {
-        CustomModal.show({ title: "Procesando pago", message: "Conectando con la base de datos...", iconType: 'success', buttons: [] });
+    // 1. Act IMMEDIATELY - don't block UI waiting for network
+    AppState.orders[sale.tableId] = [];  // Clear cart NOW
+    AppState.activeTable = null;          // Unset active table
+    closeOrderDrawer();
+    app.switchView('tables-view');
+    app.renderTablesView();
 
-        await dbManager.saveSale(sale);
-        if (doPrint) { window.print(); }
-        // Vaciar carrito
-        AppState.orders[sale.tableId] = [];
-        // Volver a mesas y actualizar redibujando listado (o quedarse y borrar state si es cajero rápido continuo)
-        app.switchView('tables-view');
-        CustomModal.show({ title: "Cobro Exitoso", message: "La venta se guardó en Google Sheets.", iconType: 'success', buttons: [{ text: 'Ok', class: 'modal-btn-primary' }] });
-
-    } catch (e) {
-        CustomModal.show({ title: "Error Servidor", message: "Error al sincronizar con Google Sheets.", buttons: [{ text: 'Ok' }] });
-        console.error(e);
+    // 2. Handle printing
+    if (doPrint) {
+        window.print();
+        // After print dialog closes, ask for additional copy
+        setTimeout(() => {
+            CustomModal.show({
+                title: '¿Copia adicional?',
+                message: '¿Deseas imprimir una copia del ticket?',
+                iconType: 'warning',
+                buttons: [
+                    { text: 'No, gracias', class: 'modal-btn-secondary' },
+                    { text: 'Imprimir copia', class: 'modal-btn-primary', onClick: () => window.print() }
+                ]
+            });
+        }, 600);
+    } else {
+        CustomModal.show({ title: 'Cobro Exitoso', message: 'La venta fue registrada.', iconType: 'success', buttons: [{ text: 'Ok', class: 'modal-btn-primary' }] });
     }
+
+    // 3. Save to Google Sheets silently in the background
+    dbManager.saveSale(sale).catch(e => {
+        console.warn('Error saving to Google Sheets (background):', e);
+    });
 }
+
 
 // --- UI RENDER FUNCTIONS ---
 function renderCategories() {
