@@ -100,6 +100,38 @@ function updateClock() {
     document.getElementById('current-time').innerText = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
 }
 
+// --- MOBILE DRAWER & CATEGORY TOGGLE ---
+function toggleOrderDrawer() {
+    const orderArea = document.getElementById('order-area');
+    if (!orderArea) return;
+    orderArea.classList.toggle('expanded');
+}
+
+function openOrderDrawer() {
+    const orderArea = document.getElementById('order-area');
+    if (orderArea) orderArea.classList.add('expanded');
+}
+
+function closeOrderDrawer() {
+    const orderArea = document.getElementById('order-area');
+    if (orderArea) orderArea.classList.remove('expanded');
+}
+
+function toggleCategories() {
+    const scroll = document.getElementById('categories-container');
+    const btn = document.getElementById('categories-toggle-btn');
+    if (!scroll || !btn) return;
+    scroll.classList.toggle('hidden');
+    btn.classList.toggle('collapsed');
+}
+
+function updateDrawerHandle(total, tableName) {
+    const drawerTotal = document.getElementById('drawer-total');
+    const drawerName = document.getElementById('drawer-table-name');
+    if (drawerTotal) drawerTotal.innerText = `€${total.toFixed(2)} →`;
+    if (drawerName) drawerName.innerText = tableName || 'Sin mesa activa';
+}
+
 // --- DATABASE LOGIC (Google Sheets API) ---
 const dbManager = {
     saveSale: async (saleData) => {
@@ -201,6 +233,12 @@ const app = {
 
         const labelText = isQuick ? tableId.replace('Rapida-', 'Ord Rápida #') : `Mesa ${tableId}`;
         document.getElementById('current-table-label').innerText = labelText;
+        // Sync handle bar
+        const cart = AppState.orders[tableId] || [];
+        const total = cart.length > 0 ? app.calcTotals(cart).total : 0;
+        updateDrawerHandle(total, labelText);
+        // Always close drawer when switching table (reset to collapsed)
+        closeOrderDrawer();
 
         renderCart();
     },
@@ -418,6 +456,10 @@ function renderCart() {
     document.getElementById('summary-subtotal').innerText = `€${totals.subtotal.toFixed(2)}`;
     document.getElementById('summary-tax').innerText = `€${totals.tax.toFixed(2)}`;
     document.getElementById('summary-total').innerText = `€${totals.total.toFixed(2)}`;
+
+    // Update mini-total on the mobile drawer handle
+    const labelText = tableId.toString().startsWith('Rapida') ? tableId.replace('Rapida-', 'Ord Rápida #') : `Mesa ${tableId}`;
+    updateDrawerHandle(totals.total, labelText);
 }
 
 

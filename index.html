@@ -110,15 +110,29 @@
                         <!-- Productos generados por JS -->
                     </div>
 
-                    <!-- Categorías abajo para no regresar -->
-                    <div class="categories-scroll" id="categories-container">
-                        <!-- Categorías generadas por JS -->
+                    <!-- Wrapper de categorías con toggle para colapsar en móvil -->
+                    <div class="categories-wrapper">
+                        <button class="categories-toggle" id="categories-toggle-btn" onclick="toggleCategories()">
+                            <span><i class="ti ti-category"></i> Categorías</span>
+                            <i class="ti ti-chevron-down"></i>
+                        </button>
+                        <div class="categories-scroll" id="categories-container">
+                            <!-- Categorías generadas por JS -->
+                        </div>
                     </div>
 
                 </div>
 
                 <!-- Columna Derecha: Ticket / Mesa Activa -->
-                <aside class="order-area">
+                <aside class="order-area" id="order-area">
+                    <!-- Handle para arrastrar el drawer (solo móvil) -->
+                    <div class="order-drag-handle" onclick="toggleOrderDrawer()">
+                        <div class="order-drag-handle-info">
+                            <span id="drawer-table-name">Sin mesa activa</span>
+                            <strong id="drawer-total">€0.00 →</strong>
+                        </div>
+                    </div>
+
                     <div class="order-header no-print">
                         <button class="action-btn" onclick="app.saveOrderState()"
                             style="background: var(--surface-color); border: 1px solid var(--divider); padding: 8px; border-radius: 6px;"><i

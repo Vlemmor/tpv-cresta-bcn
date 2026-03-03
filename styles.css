@@ -152,6 +152,7 @@ button {
     justify-content: center;
     align-items: center;
     padding: 2rem;
+    padding-bottom: calc(2rem + var(--mobile-nav-height));
 }
 
 .home-options {
@@ -306,18 +307,49 @@ button {
 }
 
 /* Categorías en la parte inferior de la grilla de productos */
+.categories-wrapper {
+    background: var(--surface-color);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    border-top: var(--glass-border);
+    order: 2;
+    z-index: 5;
+    flex-shrink: 0;
+}
+
+.categories-toggle {
+    width: 100%;
+    padding: 8px 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: none;
+    border: none;
+    border-bottom: 1px solid var(--divider);
+    cursor: pointer;
+}
+
+.categories-toggle i {
+    transition: transform 0.2s;
+}
+
+.categories-toggle.collapsed i {
+    transform: rotate(180deg);
+}
+
 .categories-scroll {
     display: flex;
     overflow-x: auto;
-    gap: 12px;
-    padding: 1rem 1.5rem;
-    background: var(--surface-color);
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.05);
+    gap: 10px;
+    padding: 0.75rem 1.5rem;
     scrollbar-width: none;
-    border-top: var(--glass-border);
-    order: 2;
-    /* Abajo */
-    z-index: 5;
+    transition: all 0.2s;
+}
+
+.categories-scroll.hidden {
+    display: none;
 }
 
 .categories-scroll::-webkit-scrollbar {
@@ -389,14 +421,77 @@ button {
     transition: opacity 0s;
 }
 
-/* --- Order Area --- */
+/* --- Order Area (Mobile: Bottom Drawer / Desktop: Sidebar) --- */
 .order-area {
     background: var(--surface-color);
     border-top: var(--glass-border);
     display: flex;
     flex-direction: column;
-    height: 48vh;
-    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
+    /* Mobile: fixed bottom drawer that expands */
+    position: fixed;
+    bottom: var(--mobile-nav-height);
+    left: 0;
+    right: 0;
+    height: 52px;
+    /* collapsed: only the handle bar */
+    max-height: 90vh;
+    z-index: 50;
+    box-shadow: 0 -6px 30px rgba(0, 0, 0, 0.15);
+    border-radius: 20px 20px 0 0;
+    transition: height 0.35s cubic-bezier(0.32, 0.72, 0, 1);
+    overflow: hidden;
+}
+
+.order-area.expanded {
+    height: calc(100vh - var(--header-height) - var(--mobile-nav-height));
+}
+
+/* Drag handle at the top of the drawer */
+.order-drag-handle {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 1.5rem;
+    cursor: pointer;
+    flex-shrink: 0;
+    gap: 6px;
+}
+
+.order-drag-handle::before {
+    content: '';
+    width: 40px;
+    height: 4px;
+    background: var(--divider);
+    border-radius: 2px;
+}
+
+.order-drag-handle-info {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    align-items: center;
+    font-size: 0.9rem;
+}
+
+.order-drag-handle-info strong {
+    color: var(--accent-primary);
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.order-drag-handle-info span {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* Extra bottom padding for products to not be hidden behind drawer */
+.menu-catalog-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    padding-bottom: 52px;
+    /* collapsed drawer height */
 }
 
 .order-header {
@@ -893,6 +988,11 @@ button {
         flex-direction: row;
         justify-content: center;
         max-width: 800px;
+        padding-bottom: 0;
+    }
+
+    #home-view {
+        padding-bottom: 2rem;
     }
 
     .home-btn {
@@ -906,6 +1006,17 @@ button {
 
     .menu-catalog-area {
         flex: 2;
+        padding-bottom: 0;
+    }
+
+    .categories-toggle {
+        display: none;
+        /* on desktop, always show categories */
+    }
+
+    .categories-scroll.hidden {
+        display: flex !important;
+        /* always visible on desktop */
     }
 
     .products-grid {
@@ -913,11 +1024,26 @@ button {
         padding: 2rem;
     }
 
+    /* On desktop, order-area is a static sidebar, not a drawer */
     .order-area {
+        position: static;
         width: 380px;
         height: auto;
+        max-height: none;
         border-top: none;
         border-left: var(--glass-border);
+        border-radius: 0;
+        box-shadow: none;
+        overflow: visible;
+    }
+
+    .order-area.expanded {
+        height: auto;
+    }
+
+    .order-drag-handle {
+        display: none;
+        /* hide the mobile drag handle on desktop */
     }
 
     .dashboard-header {
@@ -967,7 +1093,7 @@ button {
     }
 
     #printable-ticket {
-        position: absolute;
+        position: fixed;
         left: 0;
         top: 0;
         width: 100%;
@@ -977,6 +1103,17 @@ button {
         color: black;
         box-shadow: none;
         font-family: monospace, sans-serif !important;
+        overflow: visible !important;
+    }
+
+    .order-items-list {
+        overflow: visible !important;
+        height: auto !important;
+        max-height: none !important;
+    }
+
+    .ticket-container {
+        overflow: visible !important;
     }
 
     .ticket-header {
