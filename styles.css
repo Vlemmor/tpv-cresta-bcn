@@ -294,6 +294,37 @@ button {
     overflow: hidden;
 }
 
+.product-search-wrapper {
+    padding: 0.5rem 1.5rem 0rem 1.5rem;
+    order: 0;
+    position: relative;
+    z-index: 4;
+}
+
+.product-search-wrapper input {
+    width: 100%;
+    padding: 0.6rem 1rem 0.6rem 2.2rem;
+    border-radius: 8px;
+    border: 1px solid var(--divider);
+    background: var(--surface-color);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.product-search-wrapper input:focus {
+    border-color: var(--accent-primary);
+}
+
+.product-search-wrapper i {
+    position: absolute;
+    left: 2rem;
+    top: 50%;
+    transform: translateY(-20%);
+    color: var(--text-secondary);
+}
+
 .products-grid {
     flex: 1;
     overflow-y: auto;

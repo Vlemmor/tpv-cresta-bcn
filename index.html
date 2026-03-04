@@ -117,6 +117,13 @@
                         </div>
                     </div>
 
+                    <!-- Buscador de productos -->
+                    <div class="product-search-wrapper">
+                        <i class="ti ti-search"></i>
+                        <input type="text" id="product-search-input" placeholder="Buscar plato..."
+                            oninput="app.filterProducts(this.value)">
+                    </div>
+
                     <div class="products-grid" id="products-container">
                         <!-- Productos generados por JS -->
                     </div>

@@ -9,6 +9,7 @@ const AppState = {
     menu: [],
     categories: [],
     activeCategory: 'Para Compartir',
+    searchTerm: '',
     activeTable: null,
     orders: {},         // Current open orders: { '1': [], 'Rapida-1': [] }
     quickOrderCount: 0,
@@ -195,6 +196,11 @@ const app = {
 
     goHome: () => {
         app.switchView('home-view');
+    },
+
+    filterProducts: (term) => {
+        AppState.searchTerm = term;
+        renderProducts();
     },
 
     renderTablesView: () => {
@@ -415,6 +421,11 @@ function renderCategories() {
         btn.className = `category-btn ${AppState.activeCategory === cat ? 'active' : ''}`;
         btn.innerText = cat;
         btn.onclick = () => {
+            // Limpiar búsqueda al cambiar de categoría
+            AppState.searchTerm = '';
+            const searchInput = document.getElementById('product-search-input');
+            if (searchInput) searchInput.value = '';
+
             AppState.activeCategory = cat;
             renderCategories();
             renderProducts();
@@ -426,7 +437,19 @@ function renderCategories() {
 function renderProducts() {
     const container = document.getElementById('products-container');
     container.innerHTML = '';
-    const filtered = AppState.menu.filter(p => p.category === AppState.activeCategory);
+
+    let filtered;
+    if (AppState.searchTerm && AppState.searchTerm.trim() !== '') {
+        const term = AppState.searchTerm.toLowerCase().trim();
+        filtered = AppState.menu.filter(p => p.name.toLowerCase().includes(term));
+    } else {
+        filtered = AppState.menu.filter(p => p.category === AppState.activeCategory);
+    }
+
+    if (filtered.length === 0) {
+        container.innerHTML = `<p class="text-muted" style="grid-column: 1/-1; text-align: center; padding: 2rem;">No se encontraron platos.</p>`;
+        return;
+    }
 
     filtered.forEach(product => {
         const card = document.createElement('div');
