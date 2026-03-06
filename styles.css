@@ -1126,6 +1126,8 @@ button {
 
     #tpv-view {
         flex-direction: row;
+        overflow: hidden;
+        /* Prevenir scroll de la página entera */
     }
 
     .menu-catalog-area {
@@ -1133,6 +1135,8 @@ button {
         padding-bottom: 0;
         display: flex;
         flex-direction: column;
+        overflow-y: auto;
+        /* Solo scrollean los platos */
     }
 
     .categories-wrapper {
