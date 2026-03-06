@@ -40,7 +40,10 @@ const BluetoothPrinter = {
                 acceptAllDevices: true,
                 optionalServices: [
                     '000018f0-0000-1000-8000-00805f9b34fb', // Standard printer service
-                    'e7810a71-73ae-499d-8c15-faa9aef0c3f2'  // Generic serial
+                    'e7810a71-73ae-499d-8c15-faa9aef0c3f2', // Generic serial
+                    '0000fee7-0000-1000-8000-00805f9b34fb', // Common Chinese printer
+                    '49535343-fe7d-4ae5-8fa9-9fafd205e455', // ISSC
+                    '00001101-0000-1000-8000-00805f9b34fb'  // Serial Port Profile (SPP)
                 ]
             });
 
