@@ -219,7 +219,10 @@ function setupNavigation() {
 }
 function updateClock() {
     const now = new Date();
-    document.getElementById('current-time').innerText = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    const clockEl = document.getElementById('clock');
+    if (clockEl) {
+        clockEl.innerText = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
+    }
 }
 
 // --- MOBILE DRAWER & CATEGORY TOGGLE ---
