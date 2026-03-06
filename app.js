@@ -16,8 +16,20 @@ const AppState = {
 
     // Config
     taxRate: 0.10,      // IVA España 10%
-    googleSheetUrl: 'https://script.google.com/macros/s/AKfycby_9IRYStJBzb3FKu-u3V9px7ECqBW3zTRLDSbWUOzgiOwnIun7X6xzvBch4wmf5AeckQ/exec'
+    googleSheetUrl: 'https://script.google.com/macros/s/AKfycby_9IRYStJBzb3FKu-u3V9px7ECqBW3zTRLDSbWUOzgiOwnIun7X6xzvBch4wmf5AeckQ/exec',
+    firebaseConfig: {
+        apiKey: "AIzaSyCw-XoIOTTWEU7UaDHJXrolu3QlxymNALe",
+        authDomain: "tpv-la-cresta.firebaseapp.com",
+        projectId: "tpv-la-cresta",
+        storageBucket: "tpv-la-cresta.firebasestorage.app",
+        messagingSenderId: "877063345969",
+        appId: "1:877063345969:web:917bc2e5376bd301344210",
+        measurementId: "G-B8TSPLKQE7",
+        databaseURL: "https://tpv-la-cresta-default-rtdb.firebaseio.com"
+    }
 };
+
+let db; // Firebase db ref
 
 // --- INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', async () => {
@@ -31,13 +43,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Map categories in explicit order: Para Compartir, Principales, Bebidas, Postres
     AppState.categories = [...new Set(AppState.menu.map(p => p.category))];
 
-    // 4. Render UI
+    // 4. Start Persistence
+    loadFromLocalStorage(); // Load local first so it's not empty while cloud connects
+    initFirebase();
+
+    // 5. Render UI
     renderCategories();
     renderProducts();
     app.renderTablesView();
     setupDrawerSwipe(); // Enable swipe gestures on the order drawer
 
-    // 5. Setup Listeners
+    // 6. Setup Listeners
     document.getElementById('date-filter').addEventListener('change', () => {
         admin.loadDashboardData();
     });
@@ -51,6 +67,110 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Sync views
     app.switchView('home-view');
 });
+
+// --- PERSISTENCE & SYNC ---
+function saveToLocalStorage() {
+    localStorage.setItem('tpv_orders', JSON.stringify(AppState.orders));
+    localStorage.setItem('tpv_quickCount', AppState.quickOrderCount.toString());
+}
+
+function loadFromLocalStorage() {
+    const savedOrders = localStorage.getItem('tpv_orders');
+    const savedCount = localStorage.getItem('tpv_quickCount');
+    if (savedOrders) {
+        AppState.orders = JSON.parse(savedOrders);
+    }
+    if (savedCount) {
+        AppState.quickOrderCount = parseInt(savedCount);
+    }
+}
+
+function initFirebase() {
+    const statusEl = document.getElementById('sync-status');
+    const updateStatus = (type) => {
+        if (!statusEl) return;
+        if (type === 'online') {
+            statusEl.className = 'sync-status status-online';
+            statusEl.querySelector('i').className = 'ti ti-cloud-check';
+            statusEl.querySelector('span').innerText = 'Sincronizado';
+        } else if (type === 'syncing') {
+            statusEl.className = 'sync-status status-syncing';
+            statusEl.querySelector('i').className = 'ti ti-refresh';
+            statusEl.querySelector('span').innerText = 'Sincronizando...';
+        } else {
+            statusEl.className = 'sync-status status-offline';
+            statusEl.querySelector('i').className = 'ti ti-cloud-off';
+            statusEl.querySelector('span').innerText = 'Desconectado';
+        }
+    };
+
+    try {
+        if (!firebase.apps.length) {
+            firebase.initializeApp(AppState.firebaseConfig);
+        }
+        db = firebase.database();
+
+        // Listen for connection status
+        db.ref('.info/connected').on('value', (snapshot) => {
+            if (snapshot.val() === true) {
+                console.log("Sync: Connected to Firebase");
+                updateStatus('online');
+            } else {
+                console.log("Sync: Disconnected");
+                updateStatus('offline');
+            }
+        });
+
+        // Listen for changes
+        db.ref('orders').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                console.log("Sync: Orders received from cloud");
+                AppState.orders = data;
+                app.renderTablesView();
+                if (AppState.activeTable) renderCart();
+            } else {
+                console.log("Sync: Cloud is empty, checking local backup...");
+                // If cloud is null, we should probably upload our local data 
+                // ONLY IF our local data is not empty.
+                if (Object.keys(AppState.orders).length > 0) {
+                    syncToCloud();
+                }
+            }
+        });
+
+        db.ref('quickOrderCount').on('value', (snapshot) => {
+            const val = snapshot.val();
+            if (val !== null) AppState.quickOrderCount = val;
+        });
+    } catch (e) {
+        console.error("Firebase Sync Error:", e);
+        updateStatus('offline');
+    }
+}
+
+function syncToCloud() {
+    saveToLocalStorage(); // Always backup local
+    const statusEl = document.getElementById('sync-status');
+    const updateIcon = (icon, text) => {
+        if (!statusEl) return;
+        statusEl.querySelector('i').className = `ti ti-${icon}`;
+        statusEl.querySelector('span').innerText = text;
+    };
+
+    if (db) {
+        updateIcon('refresh', 'Sincronizando...');
+        db.ref('orders').set(AppState.orders)
+            .then(() => {
+                updateIcon('cloud-check', 'Sincronizado');
+            })
+            .catch(e => {
+                console.error("Cloud Write Error:", e);
+                updateIcon('cloud-off', 'Error de Sincronización');
+            });
+        db.ref('quickOrderCount').set(AppState.quickOrderCount);
+    }
+}
 
 // --- UI MODALS ---
 const CustomModal = {
@@ -200,6 +320,19 @@ const app = {
 
     filterProducts: (term) => {
         AppState.searchTerm = term;
+        const clearBtn = document.getElementById('search-clear-btn');
+        if (clearBtn) {
+            clearBtn.style.display = term ? 'flex' : 'none';
+        }
+        renderProducts();
+    },
+
+    clearSearch: () => {
+        AppState.searchTerm = '';
+        const input = document.getElementById('product-search-input');
+        if (input) input.value = '';
+        const clearBtn = document.getElementById('search-clear-btn');
+        if (clearBtn) clearBtn.style.display = 'none';
         renderProducts();
     },
 
@@ -247,6 +380,7 @@ const app = {
         AppState.quickOrderCount++;
         const newId = 'Rapida-' + AppState.quickOrderCount;
         AppState.orders[newId] = [];
+        syncToCloud();
         app.openTable(newId, true);
     },
 
@@ -275,6 +409,12 @@ const app = {
         if (existingItem) existingItem.qty += 1;
         else cart.push({ product: product, qty: 1 });
 
+        // Auto-clear search when adding an item (makes next search faster)
+        if (AppState.searchTerm) {
+            app.clearSearch();
+        }
+
+        syncToCloud();
         renderCart();
     },
 
@@ -288,6 +428,19 @@ const app = {
             cart[itemIndex].qty += delta;
             if (cart[itemIndex].qty <= 0) cart.splice(itemIndex, 1);
         }
+        syncToCloud();
+        renderCart();
+    },
+    removeItem: (productId) => {
+        const tableId = AppState.activeTable;
+        const cart = AppState.orders[tableId];
+        if (!cart) return;
+
+        const itemIndex = cart.findIndex(item => item.product.id === productId);
+        if (itemIndex > -1) {
+            cart.splice(itemIndex, 1);
+        }
+        syncToCloud();
         renderCart();
     },
 
@@ -301,6 +454,7 @@ const app = {
                 {
                     text: 'Limpiar Todo', class: 'modal-btn-primary', onClick: () => {
                         AppState.orders[AppState.activeTable] = [];
+                        syncToCloud();
                         renderCart();
                     }
                 }
@@ -402,6 +556,7 @@ const app = {
 function finalizeCheckout(sale) {
     AppState.orders[sale.tableId] = [];
     AppState.activeTable = null;
+    syncToCloud();
     closeOrderDrawer();
     app.switchView('tables-view');
     app.renderTablesView();
@@ -422,9 +577,7 @@ function renderCategories() {
         btn.innerText = cat;
         btn.onclick = () => {
             // Limpiar búsqueda al cambiar de categoría
-            AppState.searchTerm = '';
-            const searchInput = document.getElementById('product-search-input');
-            if (searchInput) searchInput.value = '';
+            app.clearSearch();
 
             AppState.activeCategory = cat;
             renderCategories();
@@ -499,6 +652,9 @@ function renderCart() {
                 <div class="item-title">${item.product.name}</div>
                 <div class="item-price">€${lineTotal}</div>
             </div>
+            <button class="remove-item-btn no-print" onclick="app.removeItem(${item.product.id})" title="Quitar item">
+                <i class="ti ti-trash"></i>
+            </button>
             <div class="print-only print-item-row">
                 <span class="print-item-name">${item.qty}x ${item.product.name}</span>
                 <span class="print-item-price">€${lineTotal}</span>

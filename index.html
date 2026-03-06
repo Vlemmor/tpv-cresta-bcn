@@ -18,7 +18,7 @@
     <!-- Tabler Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
 
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles.css?v=2">
 </head>
 
 <body>
@@ -43,8 +43,11 @@
             <div class="logo-container" onclick="app.goHome()" style="cursor: pointer;">
                 <h2>La Cresta BCN</h2>
             </div>
-            <div class="header-actions">
-                <span id="current-time">00:00</span>
+            <div class="header-right">
+                <div id="sync-status" class="sync-status status-offline">
+                    <i class="ti ti-cloud-off"></i> <span>Desconectado</span>
+                </div>
+                <div class="clock" id="clock">00:00:00</div>
                 <nav class="desktop-nav">
                     <button class="nav-btn" data-view="home-view"><i class="ti ti-home"></i> Inicio</button>
                     <button class="nav-btn" data-view="tables-view"><i class="ti ti-calculator"></i> TPV</button>
@@ -83,8 +86,13 @@
                         style="border: 1px solid var(--divider); background: var(--bg-color); border-radius: 8px;"><i
                             class="ti ti-arrow-left"></i> Inicio</button>
                     <h2>Estado del Local</h2>
-                    <button class="action-btn btn-pay" onclick="app.createNewQuickOrder()"
-                        style="border-radius: 8px; padding: 10px 15px;"><i class="ti ti-plus"></i> Rápida</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="action-btn" onclick="syncToCloud()"
+                            style="border: 1px solid var(--divider); background: var(--bg-color); border-radius: 8px; padding: 10px 15px;"><i
+                                class="ti ti-refresh"></i> Sincronizar</button>
+                        <button class="action-btn btn-pay" onclick="app.createNewQuickOrder()"
+                            style="border-radius: 8px; padding: 10px 15px;"><i class="ti ti-plus"></i> Rápida</button>
+                    </div>
                 </div>
 
                 <div class="tables-container">
@@ -122,6 +130,10 @@
                         <i class="ti ti-search"></i>
                         <input type="text" id="product-search-input" placeholder="Buscar plato..."
                             oninput="app.filterProducts(this.value)">
+                        <button class="search-clear-btn" id="search-clear-btn" onclick="app.clearSearch()"
+                            style="display: none;">
+                            <i class="ti ti-x"></i>
+                        </button>
                     </div>
 
                     <div class="products-grid" id="products-container">
@@ -132,72 +144,75 @@
 
                 <!-- Columna Derecha: Ticket / Mesa Activa -->
                 <aside class="order-area" id="order-area">
-                    <!-- Handle para arrastrar el drawer (solo móvil) -->
-                    <div class="order-drag-handle" onclick="toggleOrderDrawer()">
-                        <div class="order-drag-handle-info">
-                            <span id="drawer-table-name">Sin mesa activa</span>
-                            <strong id="drawer-total">€0.00 →</strong>
-                        </div>
-                    </div>
-
-                    <div class="order-header no-print">
-                        <button class="action-btn" onclick="app.saveOrderState()"
-                            style="background: var(--surface-color); border: 1px solid var(--divider); padding: 8px; border-radius: 6px;"><i
-                                class="ti ti-arrow-left"></i> Áreas</button>
-                        <span id="current-table-label">Mesa ---</span>
-                        <button class="clear-order-btn" onclick="app.clearCurrentOrder()" title="Limpiar Pedido"><i
-                                class="ti ti-trash"></i></button>
-                    </div>
-
-                    <!-- El ticket que se imprimirá -->
-                    <div class="ticket-container" id="printable-ticket">
-                        <div class="ticket-header print-only">
-                            <h2 class="print-logo">La Cresta BCN</h2>
-                            <p class="print-info">Ticket de Venta</p>
-                            <p class="print-info">ID: <span id="print-ticket-id">---</span></p>
-                            <p class="print-info">Fecha: <span id="print-date">---</span></p>
-                            <p class="print-info">Sala: <span id="print-table">---</span></p>
-                            <hr class="print-divider">
-                        </div>
-
-                        <div class="order-items-list" id="order-items">
-                            <!-- Items de la mesa generados por JS -->
-                        </div>
-
-                        <div class="order-summary">
-                            <hr class="print-divider print-only">
-                            <div class="summary-row text-muted">
-                                <span>Subtotal (Base)</span>
-                                <span id="summary-subtotal">€0.00</span>
-                            </div>
-                            <div class="summary-row text-muted">
-                                <span>IVA (10%)</span>
-                                <span id="summary-tax">€0.00</span>
-                            </div>
-                            <div class="summary-row total-row">
-                                <span>Total</span>
-                                <span id="summary-total">€0.00</span>
+                    <div class="order-area-content">
+                        <!-- Handle para arrastrar el drawer (solo móvil) -->
+                        <div class="order-drag-handle" onclick="toggleOrderDrawer()">
+                            <div class="order-drag-handle-info">
+                                <span id="drawer-table-name">Sin mesa activa</span>
+                                <strong id="drawer-total">€0.00 →</strong>
                             </div>
                         </div>
 
-                        <div class="ticket-footer print-only">
-                            <p>¡Gracias por su visita!</p>
-                            <p>Desarrollado con ♥ por TPV System</p>
+                        <div class="order-header no-print">
+                            <button class="action-btn" onclick="app.saveOrderState()"
+                                style="background: var(--surface-color); border: 1px solid var(--divider); padding: 8px; border-radius: 6px;"><i
+                                    class="ti ti-arrow-left"></i> Áreas</button>
+                            <span id="current-table-label">Mesa ---</span>
+                            <button class="clear-order-btn" onclick="app.clearCurrentOrder()" title="Limpiar Pedido"><i
+                                    class="ti ti-trash"></i></button>
+                        </div>
+
+                        <!-- El ticket que se imprimirá -->
+                        <div class="ticket-container" id="printable-ticket">
+                            <div class="ticket-header print-only">
+                                <h2 class="print-logo">La Cresta BCN</h2>
+                                <p class="print-info">Ticket de Venta</p>
+                                <p class="print-info">ID: <span id="print-ticket-id">---</span></p>
+                                <p class="print-info">Fecha: <span id="print-date">---</span></p>
+                                <p class="print-info">Sala: <span id="print-table">---</span></p>
+                                <option class="print-divider">
+                            </div>
+
+                            <div class="order-items-list" id="order-items">
+                                <!-- Items de la mesa generados por JS -->
+                            </div>
+
+                            <div class="order-summary">
+                                <hr class="print-divider print-only">
+                                <div class="summary-row text-muted">
+                                    <span>Subtotal (Base)</span>
+                                    <span id="summary-subtotal">€0.00</span>
+                                </div>
+                                <div class="summary-row text-muted">
+                                    <span>IVA (10%)</span>
+                                    <span id="summary-tax">€0.00</span>
+                                </div>
+                                <div class="summary-row total-row">
+                                    <span>Total</span>
+                                    <span id="summary-total">€0.00</span>
+                                </div>
+                            </div>
+
+                            <div class="ticket-footer print-only">
+                                <p>¡Gracias por su visita!</p>
+                                <p>Desarrollado con ♥ por TPV System</p>
+                            </div>
+                        </div>
+
+                        <div class="order-actions no-print">
+                            <button class="action-btn btn-save" onclick="app.saveOrderState()"><i
+                                    class="ti ti-device-floppy"></i> Guardar Mesero</button>
+                            <button class="action-btn btn-print" onclick="app.printTicket()"><i
+                                    class="ti ti-printer"></i>
+                                Pre-cuenta</button>
+                        </div>
+                        <!-- Botón de cobro final grande y separado -->
+                        <div class="order-actions full no-print" style="padding-top: 0;">
+                            <button class="action-btn btn-pay" id="main-checkout-btn" onclick="app.checkoutTable()"><i
+                                    class="ti ti-cash"></i>
+                                Guardar y Cerrar Pedido</button>
                         </div>
                     </div>
-
-                    <div class="order-actions no-print">
-                        <button class="action-btn btn-save" onclick="app.saveOrderState()"><i
-                                class="ti ti-device-floppy"></i> Guardar Mesero</button>
-                        <button class="action-btn btn-print" onclick="app.printTicket()"><i class="ti ti-printer"></i>
-                            Pre-cuenta</button>
-                    </div>
-                    <!-- Botón de cobro final grande y separado -->
-                    <div class="order-actions full no-print" style="padding-top: 0;">
-                        <button class="action-btn btn-pay" onclick="app.checkoutTable()"><i class="ti ti-cash"></i>
-                            Cobrar y Cerrar Pedido</button>
-                    </div>
-
                 </aside>
             </section>
 
@@ -287,9 +302,13 @@
 
     </div>
 
+    <!-- FIREBASE SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
     <!-- SCRIPTS -->
-    <script src="menu_data.js"></script>
-    <script src="app.js"></script>
+    <script src="menu_data.js?v=2"></script>
+    <script src="app.js?v=2"></script>
 </body>
 
 </html>
