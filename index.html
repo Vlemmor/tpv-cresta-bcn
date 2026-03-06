@@ -18,7 +18,7 @@
     <!-- Tabler Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
 
-    <link rel="stylesheet" href="styles.css?v=7">
+    <link rel="stylesheet" href="styles.css?v=8">
 </head>
 
 <body>
@@ -44,6 +44,10 @@
                 <h2>La Cresta BCN</h2>
             </div>
             <div class="header-right">
+                <button id="printer-status-btn" class="nav-btn" onclick="app.connectPrinter()"
+                    style="border: 1px solid var(--divider); margin-right: 10px;" title="Conectar Impresora Térmica">
+                    <i class="ti ti-printer"></i> <span class="desktop-nav">Vincular</span>
+                </button>
                 <div id="sync-status" class="sync-status status-offline">
                     <i class="ti ti-cloud-off"></i> <span>Desconectado</span>
                 </div>
@@ -307,8 +311,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <!-- SCRIPTS -->
-    <script src="menu_data.js?v=7"></script>
-    <script src="app.js?v=7"></script>
+    <script src="menu_data.js?v=8"></script>
+    <script src="printer_bt.js?v=8"></script>
+    <script src="app.js?v=8"></script>
 </body>
 
 </html>

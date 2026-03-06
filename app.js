@@ -544,14 +544,43 @@ const app = {
         const total = itemsSum;
         return { subtotal, tax, total };
     },
+    connectPrinter: async () => {
+        const success = await BluetoothPrinter.connect();
+        app.updatePrinterUIStatus();
+    },
 
-    printTicket: () => {
+    updatePrinterUIStatus: () => {
+        const btn = document.getElementById('printer-status-btn');
+        if (!btn) return;
+        if (BluetoothPrinter.isConnected) {
+            btn.innerHTML = '<i class="ti ti-printer"></i> <span class="desktop-nav">Conectada</span>';
+            btn.style.color = 'var(--success)';
+            btn.style.borderColor = 'var(--success)';
+        } else {
+            btn.innerHTML = '<i class="ti ti-printer"></i> <span class="desktop-nav">Vincular</span>';
+            btn.style.color = '';
+            btn.style.borderColor = 'var(--divider)';
+        }
+    },
+
+    printTicket: async () => {
         const cart = AppState.orders[AppState.activeTable];
         if (!cart || cart.length === 0) {
             CustomModal.show({ title: "Vacío", message: "No se puede imprimir un ticket en blanco.", buttons: [{ text: 'Ok', class: 'modal-btn-primary' }] });
             return;
         }
-        window.print();
+
+        if (typeof BluetoothPrinter !== 'undefined' && BluetoothPrinter.isConnected) {
+            CustomModal.show({ title: "Imprimiendo...", message: "Enviando ticket a la impresora Bluetooth." });
+            const success = await BluetoothPrinter.printReceipt(AppState.activeTable, cart);
+            CustomModal.hide();
+            if (!success) {
+                CustomModal.show({ title: "Error", message: "Falló la impresión Bluetooth.", iconType: "danger", buttons: [{ text: 'Ok' }] });
+            }
+        } else {
+            // Fallback (native print for PC or PDF)
+            window.print();
+        }
     }
 };
 
