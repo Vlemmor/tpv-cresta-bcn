@@ -1158,8 +1158,8 @@ button {
     .order-area {
         position: static !important;
         width: 380px !important;
-        height: calc(100vh - var(--header-height)) !important;
-        max-height: 100vh !important;
+        height: 100% !important;
+        max-height: 100% !important;
         display: flex !important;
         flex-direction: column !important;
         overflow: hidden !important;
