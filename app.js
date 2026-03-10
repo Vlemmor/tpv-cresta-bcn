@@ -631,7 +631,16 @@ const app = {
                 },
                 {
                     text: 'Marcar SALIDA', class: 'modal-btn-primary danger', onClick: () => {
-                        app.sendAttendanceToCloud(name, 'SALIDA');
+                        // Confirmación v13
+                        CustomModal.show({
+                            title: "¿Confirmar SALIDA?",
+                            message: `${name}, ¿estás seguro de que deseas marcar tu salida ahora?`,
+                            iconType: 'danger',
+                            buttons: [
+                                { text: 'No, cancelar', class: 'modal-btn-secondary' },
+                                { text: 'Sí, marcar salida', class: 'modal-btn-primary danger', onClick: () => app.sendAttendanceToCloud(name, 'SALIDA') }
+                            ]
+                        });
                     }
                 }
             ]

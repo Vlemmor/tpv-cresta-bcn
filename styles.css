@@ -971,6 +971,10 @@ button {
     background: var(--success);
 }
 
+.modal-btn-primary.danger {
+    background: var(--danger);
+}
+
 .modal-btn-secondary {
     background: var(--bg-color);
     color: var(--text-primary);
