@@ -1,5 +1,8 @@
-// Datos preliminares extraídos de la carta en PDF
+// Datos del catálogo La Cresta BCN (v10)
 const initialMenuData = [
+    // === MENÚ ===
+    { id: 100, name: "Menú del Día", category: "Menú", price: 12.90 }, // Precio placeholder, ajustar si es necesario
+
     // === PARA COMPARTIR ===
     { id: 13, name: "Pan de coca con tomate", category: "Para Compartir", price: 2.90 },
     { id: 14, name: "Escudella", category: "Para Compartir", price: 8.90 },
@@ -14,7 +17,7 @@ const initialMenuData = [
     { id: 23, name: "Huevos Rotos con Butifarra Perol", category: "Para Compartir", price: 8.90 },
     { id: 24, name: "Canelones de Pollo a la Huacaina", category: "Para Compartir", price: 10.80 },
 
-    // === PRINCIPALES (Tierra y Mar Unificados) ===
+    // === PRINCIPALES ===
     { id: 1, name: "Anticucho de Pollo", category: "Principales", price: 6.50 },
     { id: 3, name: "Cachopo de Pollo a la Caprese", category: "Principales", price: 13.80 },
     { id: 4, name: "Entraña con Chimichurri", category: "Principales", price: 13.80 },
@@ -25,13 +28,54 @@ const initialMenuData = [
     { id: 10, name: "Ceviche Clásico", category: "Principales", price: 17.80 },
     { id: 12, name: "Calamarcitos Anticuchados", category: "Principales", price: 10.90 },
 
-    // === BEBIDAS / CÓCTELES ===
-    { id: 33, name: "Pisco Sour Clásico", category: "Bebidas", price: 8.50 },
-    { id: 34, name: "Pisco Sour de Maracuyá", category: "Bebidas", price: 9.50 },
+    // === BEBIDAS ===
+    { id: 38, name: "Chicha Morada", category: "Bebidas", price: 3.90 },
+    { id: 40, name: "Vichy Catalan", category: "Bebidas", price: 2.80 },
+    { id: 41, name: "Agua", category: "Bebidas", price: 2.40 },
+    { id: 42, name: "Aquarius", category: "Bebidas", price: 2.50 },
+    { id: 43, name: "Batido", category: "Bebidas", price: 4.80 },
+    { id: 44, name: "Bitácora Blanco", category: "Bebidas", price: 15.90 },
+    { id: 45, name: "Cava Pere Barnada", category: "Bebidas", price: 16.80 },
+    { id: 46, name: "Cerveza", category: "Bebidas", price: 3.00 },
+    { id: 47, name: "Copa de Cava", category: "Bebidas", price: 3.80 },
+    { id: 48, name: "Copa de Vino", category: "Bebidas", price: 3.80 },
+    { id: 49, name: "Cresta Verano", category: "Bebidas", price: 8.50 },
+    { id: 50, name: "Cubata", category: "Bebidas", price: 5.80 },
+    { id: 51, name: "Coca Cola", category: "Bebidas", price: 2.50 },
+    { id: 52, name: "Cóctel sin Alcohol", category: "Bebidas", price: 6.90 },
+    { id: 53, name: "Fanta (Caja)", category: "Bebidas", price: 2.50 },
+    { id: 54, name: "Inurrieta Rosado", category: "Bebidas", price: 15.90 },
+    { id: 55, name: "Luis Caña Tinto", category: "Bebidas", price: 17.80 },
     { id: 35, name: "Mojito de Maracuyá", category: "Bebidas", price: 8.50 },
-    { id: 36, name: "Sangría de Maracuyá (Jarra 1L)", category: "Bebidas", price: 13.90 },
-    { id: 37, name: "Cresta Verano", category: "Bebidas", price: 8.50 },
-    { id: 38, name: "Vaso de Chicha Morada", category: "Bebidas", price: 3.90 },
+    { id: 34, name: "Pisco Sour Maracuyá", category: "Bebidas", price: 9.50 },
+    { id: 33, name: "Pisco Clásico", category: "Bebidas", price: 8.50 },
+    { id: 56, name: "Refresco", category: "Bebidas", price: 2.50 },
+    { id: 57, name: "Samerola Tinto", category: "Bebidas", price: 15.90 },
+    { id: 36, name: "Sangría de Maracuyá", category: "Bebidas", price: 13.90 },
+    { id: 58, name: "Tónica", category: "Bebidas", price: 2.80 },
+    { id: 59, name: "Vermut", category: "Bebidas", price: 3.80 },
+
+    // === CAFÉS E INFUSIONES ===
+    { id: 60, name: "Americano", category: "Cafés e Infusiones", price: 1.60 },
+    { id: 61, name: "Batido de Fruta", category: "Cafés e Infusiones", price: 5.50 },
+    { id: 62, name: "Batido Power", category: "Cafés e Infusiones", price: 5.80 },
+    { id: 63, name: "Café Solo", category: "Cafés e Infusiones", price: 1.40 },
+    { id: 64, name: "Café con Leche", category: "Cafés e Infusiones", price: 1.70 },
+    { id: 65, name: "Café Cortado", category: "Cafés e Infusiones", price: 1.50 },
+    { id: 66, name: "Café para Llevar", category: "Cafés e Infusiones", price: 1.45 },
+    { id: 67, name: "Carajillo", category: "Cafés e Infusiones", price: 2.50 },
+    { id: 68, name: "Infusiones", category: "Cafés e Infusiones", price: 1.80 },
+    { id: 69, name: "Quinua con Leche (Vaso)", category: "Cafés e Infusiones", price: 2.60 },
+
+    // === DESAYUNOS Y PLATOS ===
+    { id: 70, name: "Batido Power Maca", category: "Desayunos", price: 5.80 },
+    { id: 71, name: "Chicharrón Peruano", category: "Desayunos", price: 8.50 },
+    { id: 72, name: "Club de Amigos", category: "Desayunos", price: 11.80 },
+    { id: 73, name: "Huevos Benedictinos", category: "Desayunos", price: 8.90 },
+    { id: 74, name: "Mollete de Queso Cabra", category: "Desayunos", price: 7.60 },
+    { id: 75, name: "Mollete Marino", category: "Desayunos", price: 7.80 },
+    { id: 76, name: "Pepito de Ternera", category: "Desayunos", price: 7.80 },
+    { id: 77, name: "Quinua con Leche (Plato)", category: "Desayunos", price: 4.50 },
 
     // === POSTRES ===
     { id: 28, name: "Dulce de Tres Leches", category: "Postres", price: 5.80 },

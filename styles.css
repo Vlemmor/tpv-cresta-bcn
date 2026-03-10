@@ -89,12 +89,14 @@ button {
 }
 
 .logo-container h2 {
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    background: linear-gradient(135deg, #F97316, #EA580C);
+    font-weight: 800;
+    font-size: 1.5rem;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #F97316 0%, #EA580C 50%, #9A3412 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.05);
 }
 
 .header-actions {
@@ -213,6 +215,8 @@ button {
 #tables-view {
     padding: 1.5rem;
     overflow-y: auto;
+    padding-bottom: 120px !important;
+    /* Fix for mobile menu overlap */
 }
 
 .tables-header {
@@ -245,13 +249,17 @@ button {
 
 .table-card {
     background: var(--surface-color);
-    border: var(--glass-border);
+    border: 1px solid var(--divider);
     border-radius: var(--border-radius-md);
-    padding: 1.5rem;
+    padding: 1rem;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 120px;
 }
 
 .table-card:hover {
@@ -260,8 +268,31 @@ button {
 }
 
 .table-card h4 {
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+    color: #1e293b;
+}
+
+.table-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: auto;
+}
+
+.table-id {
+    color: var(--text-secondary);
+}
+
+.table-capacity {
+    background: var(--bg-color);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--divider);
 }
 
 .table-card .table-empty {
@@ -296,6 +327,7 @@ button {
    ========================================= */
 #tpv-view {
     flex-direction: column;
+    padding-bottom: 100px !important;
 }
 
 .menu-catalog-area {

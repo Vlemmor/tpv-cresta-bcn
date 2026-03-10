@@ -18,7 +18,7 @@
     <!-- Tabler Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
 
-    <link rel="stylesheet" href="styles.css?v=9">
+    <link rel="stylesheet" href="styles.css?v=10">
 </head>
 
 <body>
@@ -78,6 +78,13 @@
                         <i class="ti ti-armchair"></i>
                         Órdenes de Sala
                         <p>Mesas y estado de cuenta actual</p>
+                    </button>
+
+                    <button class="home-btn" onclick="app.showAttendanceModal()"
+                        style="border-top: 4px solid var(--accent-primary);">
+                        <i class="ti ti-id-badge"></i>
+                        Control Asistencia
+                        <p>Fichar entrada y salida (Adalila / Emiliano)</p>
                     </button>
 
                 </div>
@@ -311,9 +318,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <!-- SCRIPTS -->
-    <script src="menu_data.js?v=9"></script>
-    <script src="printer_bt.js?v=9"></script>
-    <script src="app.js?v=9"></script>
+    <script src="menu_data.js?v=10"></script>
+    <script src="printer_bt.js?v=10"></script>
+    <script src="app.js?v=10"></script>
 </body>
 
 </html>

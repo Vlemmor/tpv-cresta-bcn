@@ -10,9 +10,22 @@ const AppState = {
     categories: [],
     activeCategory: 'Para Compartir',
     searchTerm: '',
-    activeTable: null,
     orders: {},         // Current open orders: { '1': [], 'Rapida-1': [] }
     quickOrderCount: 0,
+    activeTable: null,
+
+    // NEW v10 Configuracion de Mesas
+    tablesConfig: [
+        { id: 1, capacity: 4 },
+        { id: 2, capacity: "1/2" },
+        { id: 3, capacity: 5 },
+        { id: 4, capacity: "1/2" },
+        { id: 5, capacity: 2 },
+        { id: 6, capacity: 8 },
+        { id: 7, capacity: 2 },
+        { id: 8, capacity: 4 },
+        { id: 9, capacity: 6 }
+    ],
 
     // Config
     taxRate: 0.10,      // IVA España 10%
@@ -40,8 +53,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 2. Load Data
     AppState.menu = initialMenuData;
-    // Map categories in explicit order: Para Compartir, Principales, Bebidas, Postres
-    AppState.categories = [...new Set(AppState.menu.map(p => p.category))];
+    // Explicit order for categories
+    AppState.categories = ["Menú", "Para Compartir", "Principales", "Desayunos", "Bebidas", "Cafés e Infusiones", "Postres"];
+    AppState.activeCategory = "Menú";
 
     // 4. Start Persistence
     loadFromLocalStorage(); // Load local first so it's not empty while cloud connects
@@ -344,7 +358,8 @@ const app = {
         const quickGrid = document.getElementById('quick-orders-grid');
 
         tablesGrid.innerHTML = '';
-        for (let i = 1; i <= 10; i++) {
+        AppState.tablesConfig.forEach(config => {
+            const i = config.id;
             let total = 0;
             let isActive = false;
             if (AppState.orders[i] && AppState.orders[i].length > 0) {
@@ -353,11 +368,15 @@ const app = {
             }
             tablesGrid.innerHTML += `
                 <div class="table-card ${isActive ? 'active' : ''}" onclick="app.openTable('${i}', false)">
+                    <div class="table-card-header">
+                        <span class="table-id">${i < 10 ? '0' + i : i}</span>
+                        <span class="table-capacity">${config.capacity} Persona</span>
+                    </div>
                     <h4>Mesa ${i}</h4>
                     ${isActive ? `<p class="table-total">€${total.toFixed(2)}</p>` : `<p class="table-empty">Libre</p>`}
                 </div>
             `;
-        }
+        });
 
         quickGrid.innerHTML = '';
         let hasQuick = false;
