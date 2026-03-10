@@ -1,7 +1,7 @@
 // Datos del catálogo La Cresta BCN (v10)
 const initialMenuData = [
     // === MENÚ ===
-    { id: 100, name: "Menú del Día", category: "Menú", price: 12.90 }, // Precio placeholder, ajustar si es necesario
+    { id: 100, name: "Menú del Día", category: "Menú", price: 13.90 },
 
     // === PARA COMPARTIR ===
     { id: 13, name: "Pan de coca con tomate", category: "Para Compartir", price: 2.90 },

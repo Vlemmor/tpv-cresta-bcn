@@ -17,9 +17,9 @@ const AppState = {
     // NEW v10 Configuracion de Mesas
     tablesConfig: [
         { id: 1, capacity: 4 },
-        { id: 2, capacity: "1/2" },
+        { id: 2, capacity: 2 },
         { id: 3, capacity: 5 },
-        { id: 4, capacity: "1/2" },
+        { id: 4, capacity: 2 },
         { id: 5, capacity: 2 },
         { id: 6, capacity: 8 },
         { id: 7, capacity: 2 },
@@ -52,7 +52,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     setInterval(updateClock, 1000);
 
     // 2. Load Data
-    AppState.menu = initialMenuData;
+    // Alphabetical Sorting v11
+    AppState.menu = initialMenuData.sort((a, b) => a.name.localeCompare(b.name));
     // Explicit order for categories
     AppState.categories = ["Menú", "Para Compartir", "Principales", "Desayunos", "Bebidas", "Cafés e Infusiones", "Postres"];
     AppState.activeCategory = "Menú";
