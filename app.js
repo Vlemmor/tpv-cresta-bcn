@@ -30,6 +30,7 @@ const AppState = {
     // Config
     taxRate: 0.10,      // IVA España 10%
     googleSheetUrl: 'https://script.google.com/macros/s/AKfycby_9IRYStJBzb3FKu-u3V9px7ECqBW3zTRLDSbWUOzgiOwnIun7X6xzvBch4wmf5AeckQ/exec',
+    googleSheetAttendanceUrl: '', // Pega aquí la nueva URL de asistencia cuando la tengas (v14)
     firebaseConfig: {
         apiKey: "AIzaSyCw-XoIOTTWEU7UaDHJXrolu3QlxymNALe",
         authDomain: "tpv-la-cresta.firebaseapp.com",
@@ -648,17 +649,29 @@ const app = {
     },
 
     sendAttendanceToCloud: (name, action) => {
+        const now = new Date();
         const log = {
             type: 'attendance',
             name: name,
             action: action,
-            timestamp: new Date().toISOString(),
+            date: now.toLocaleDateString(),
+            time: now.toLocaleTimeString(),
+            timestamp: now.toISOString(),
             id: `ATT-${Date.now()}`
         };
 
         CustomModal.show({ title: "Registrando...", message: "Guardando datos de asistencia...", buttons: [] });
 
-        dbManager.saveSale(log)
+        // v14: Usar URL independiente si existe
+        const targetUrl = AppState.googleSheetAttendanceUrl || AppState.googleSheetUrl;
+
+        fetch(targetUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            cache: 'no-cache',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(log)
+        })
             .then(() => {
                 CustomModal.show({
                     title: "¡Listo!",
