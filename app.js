@@ -30,7 +30,7 @@ const AppState = {
     // Config
     taxRate: 0.10,      // IVA España 10%
     googleSheetUrl: 'https://script.google.com/macros/s/AKfycby_9IRYStJBzb3FKu-u3V9px7ECqBW3zTRLDSbWUOzgiOwnIun7X6xzvBch4wmf5AeckQ/exec',
-    googleSheetAttendanceUrl: '', // Pega aquí la nueva URL de asistencia cuando la tengas (v14)
+    googleSheetAttendanceUrl: 'https://script.google.com/macros/s/AKfycbwwoOnHCWqLJsHcvk25VjYgXFfPbF59CeFTqMUTCvrEAVxrvt9avcP8lzHgS-2y-U4/exec', // Conectado v14
     firebaseConfig: {
         apiKey: "AIzaSyCw-XoIOTTWEU7UaDHJXrolu3QlxymNALe",
         authDomain: "tpv-la-cresta.firebaseapp.com",

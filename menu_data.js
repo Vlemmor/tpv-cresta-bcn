@@ -25,7 +25,7 @@ const initialMenuData = [
     { id: 6, name: "Meloso de Costilla de Vaca", category: "Principales", price: 16.80 },
     { id: 7, name: "Cachopo de Ternera", category: "Principales", price: 14.80 },
     { id: 9, name: "Ceviche Carretillero", category: "Principales", price: 18.80 },
-    { id: 10, name: "Ceviche Clásico", category: "Principales", price: 17.80 },
+    { id: 10, name: "Ceviche Clásico", category: "Principales", price: 17.80, video: "https://drive.google.com/file/d/1DKjaD5hFScYKkKQdiRyMno40gcjjVoCs/view?usp=drive_link" },
     { id: 12, name: "Calamarcitos Anticuchados", category: "Principales", price: 10.90 },
 
     // === BEBIDAS ===
