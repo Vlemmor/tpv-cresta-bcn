@@ -601,6 +601,67 @@ const app = {
             // Fallback (native print for PC or PDF)
             window.print();
         }
+    },
+
+    // --- ATTENDANCE MODULE v12 ---
+    showAttendanceModal: () => {
+        CustomModal.show({
+            title: "Control de Asistencia",
+            message: "Selecciona el trabajador para registrar jornada:",
+            iconType: 'warning',
+            buttons: [
+                { text: 'Cancelar', class: 'modal-btn-secondary' },
+                { text: 'Adalila', class: 'modal-btn-primary', onClick: () => app.registerShifts('Adalila') },
+                { text: 'Emiliano', class: 'modal-btn-primary', onClick: () => app.registerShifts('Emiliano') }
+            ]
+        });
+    },
+
+    registerShifts: (name) => {
+        CustomModal.show({
+            title: `Hola ${name}`,
+            message: "¿Qué acción de jornada deseas realizar?",
+            iconType: 'warning',
+            buttons: [
+                { text: 'Cancelar', class: 'modal-btn-secondary' },
+                {
+                    text: 'Marcar ENTRADA', class: 'modal-btn-primary success', onClick: () => {
+                        app.sendAttendanceToCloud(name, 'ENTRADA');
+                    }
+                },
+                {
+                    text: 'Marcar SALIDA', class: 'modal-btn-primary danger', onClick: () => {
+                        app.sendAttendanceToCloud(name, 'SALIDA');
+                    }
+                }
+            ]
+        });
+    },
+
+    sendAttendanceToCloud: (name, action) => {
+        const log = {
+            type: 'attendance',
+            name: name,
+            action: action,
+            timestamp: new Date().toISOString(),
+            id: `ATT-${Date.now()}`
+        };
+
+        CustomModal.show({ title: "Registrando...", message: "Guardando datos de asistencia...", buttons: [] });
+
+        dbManager.saveSale(log)
+            .then(() => {
+                CustomModal.show({
+                    title: "¡Listo!",
+                    message: `${name}: Se ha registrado tu ${action} correctamente.`,
+                    iconType: 'success',
+                    buttons: [{ text: 'Entendido', class: 'modal-btn-primary' }]
+                });
+            })
+            .catch(e => {
+                console.error("Error asistencia", e);
+                CustomModal.show({ title: "Error", message: "No se pudo registrar la asistencia.", iconType: "danger", buttons: [{ text: 'Ok' }] });
+            });
     }
 };
 
