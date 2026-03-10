@@ -18,7 +18,7 @@
     <!-- Tabler Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css" />
 
-    <link rel="stylesheet" href="styles.css?v=14">
+    <link rel="stylesheet" href="styles.css?v=15">
 </head>
 
 <body>
@@ -175,13 +175,13 @@
 
                         <!-- El ticket que se imprimirá -->
                         <div class="ticket-container" id="printable-ticket">
-                            <div class="ticket-header print-only">
-                                <h2 class="print-logo">La Cresta BCN</h2>
-                                <p class="print-info">Ticket de Venta</p>
-                                <p class="print-info">ID: <span id="print-ticket-id">---</span></p>
-                                <p class="print-info">Fecha: <span id="print-date">---</span></p>
-                                <p class="print-info">Sala: <span id="print-table">---</span></p>
-                                <option class="print-divider">
+                            <div class="ticket-header">
+                                <h3 class="print-only">LA CRESTA BCN</h3>
+                                <div id="print-header-legal" class="print-only"></div>
+                                <div class="print-divider print-only"></div>
+                                <p><i class="ti ti-calendar"></i> <span id="print-date">--/--/----</span></p>
+                                <p><i class="ti ti-hash"></i> <span id="print-ticket-id">T-000000</span></p>
+                                <p><i class="ti ti-armchair"></i> <span id="print-table">Mesa --</span></p>
                             </div>
 
                             <div class="order-items-list" id="order-items">
@@ -204,7 +204,7 @@
                                 </div>
                             </div>
 
-                            <div class="ticket-footer print-only">
+                            <div class="ticket-footer print-only" id="print-ticket-footer">
                                 <p>¡Gracias por su visita!</p>
                                 <p>Desarrollado con ♥ por TPV System</p>
                             </div>
@@ -318,9 +318,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <!-- SCRIPTS -->
-    <script src="menu_data.js?v=14"></script>
-    <script src="printer_bt.js?v=14"></script>
-    <script src="app.js?v=14"></script>
+    <script src="menu_data.js?v=15"></script>
+    <script src="printer_bt.js?v=15"></script>
+    <script src="app.js?v=15"></script>
 </body>
 
 </html>

@@ -1,0 +1,8 @@
+# Carpeta de Videos de La Cresta BCN
+
+Para que tus videos 4K carguen instantáneamente y sin errores:
+1. Descarga tus videos de Google Drive.
+2. Copia los archivos `.mp4` a esta carpeta.
+3. Cambia el nombre del archivo en `menu_data.js` para que coincida (ej: `video: "videos/ceviche.mp4"`).
+
+Esto garantiza que el menú funcione incluso si el internet está lento.

@@ -142,7 +142,7 @@ const BluetoothPrinter = {
     boldOn: function () { return [ESC, 0x45, 1]; },
     boldOff: function () { return [ESC, 0x45, 0]; },
     textSize: function (width, height) { return [GS, 0x21, (width << 4) | height]; },
-    cutPaper: function () { return [GS, 0x56, 0x00]; },
+    cutPaper: function () { return [GS, 0x56, 0x42, 0x00]; }, // Full cut v15
     newLine: function () { return [0x0A]; },
     initPrinter: function () { return [ESC, 0x40]; },
 
@@ -167,13 +167,18 @@ const BluetoothPrinter = {
         // Initialize
         data.push(...this.initPrinter());
 
-        // Header
+        // Header Legal v15
         data.push(...this.alignCenter());
         data.push(...this.textSize(1, 1)); // Double width & height
         data.push(...this.boldOn());
         data.push(...this.textToBytes("LA CRESTA BCN\n"));
         data.push(...this.textSize(0, 0)); // Normal
         data.push(...this.boldOff());
+        data.push(...this.textToBytes("CIF: 60054692J\n"));
+        data.push(...this.textToBytes("C/ Torre dels Pardals, 25\n"));
+        data.push(...this.textToBytes("Horta-Guinardo, BCN\n"));
+        data.push(...this.textToBytes("Tlf: 654 62 69 27\n"));
+        data.push(...this.newLine());
         data.push(...this.textToBytes("Ticket de Venta\n"));
         data.push(...this.newLine());
 
@@ -210,10 +215,15 @@ const BluetoothPrinter = {
 
         data.push(...this.newLine());
         data.push(...this.alignCenter());
+        data.push(...this.textToBytes("PROMO: Postre CORTESIA\n"));
+        data.push(...this.textToBytes("si nos dejas una reseña en\n"));
+        data.push(...this.textToBytes("Google o Instagram! :)\n"));
+        data.push(...this.newLine());
         data.push(...this.textToBytes("Gracias por su visita!\n"));
         data.push(...this.newLine());
         data.push(...this.newLine());
         data.push(...this.newLine());
+        data.push(...this.newLine()); // Extra space before cut
 
         // Cut
         data.push(...this.cutPaper());

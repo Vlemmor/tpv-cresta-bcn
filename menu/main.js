@@ -67,17 +67,22 @@ function renderFeed(items) {
 
         let mediaUrl = item.video || PLACEHOLDERS[item.category] || PLACEHOLDERS["Principales"];
 
-        // Convertir link de Google Drive a link Directo
-        if (mediaUrl.includes('drive.google.com')) {
+        // Soporte para Google Drive (con advertencia de CORS)
+        const isDrive = mediaUrl.includes('drive.google.com');
+        if (isDrive) {
             const fileId = mediaUrl.split('/d/')[1]?.split('/')[0] || mediaUrl.split('id=')[1]?.split('&')[0];
             if (fileId) mediaUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
         }
 
-        const isVideo = mediaUrl.endsWith('.mp4') || item.video || mediaUrl.includes('google.com/uc');
+        const isVideo = mediaUrl.endsWith('.mp4') || mediaUrl.includes('google.com/uc') || isDrive;
 
         reelItem.innerHTML = `
             ${isVideo
-                ? `<video class="reel-media" src="${mediaUrl}" autoplay loop muted playsinline poster="${PLACEHOLDERS[item.category]}"></video>`
+                ? `<video class="reel-media" src="${mediaUrl}" autoplay loop muted playsinline 
+                    poster="${PLACEHOLDERS[item.category]}"
+                    onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                   </video>
+                   <img class="reel-media" src="${PLACEHOLDERS[item.category]}" style="display:none;">`
                 : `<img class="reel-media" src="${mediaUrl}" alt="${item.name}" loading="lazy">`
             }
             <div class="reel-overlay">

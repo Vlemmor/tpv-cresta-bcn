@@ -584,6 +584,30 @@ const app = {
         }
     },
 
+    getBusinessHeader: () => `
+        <div class="print-info">CIF: 60054692J</div>
+        <div class="print-info">Carrer de la Torre dels Pardals, 25</div>
+        <div class="print-info">08041, Horta-Guinardó, BCN</div>
+        <div class="print-info">Tlf: 654 62 69 27</div>
+    `,
+
+    getTicketFooter: () => `
+        <div class="print-promo">
+            🎁 <b>POSTRE GRATIS:</b> Si nos dejas una reseña en Google o IG, 
+            el postre de tu próxima visita corre por nuestra cuenta.
+        </div>
+        <div class="qr-container">
+            <div class="qr-box">
+                <img src="qr_instagram.png" alt="QR IG">
+                <div class="qr-label">INSTAGRAM</div>
+            </div>
+            <div class="qr-box">
+                <img src="qr_google.png" alt="QR Google">
+                <div class="qr-label">RESEÑA GOOGLE</div>
+            </div>
+        </div>
+    `,
+
     printTicket: async () => {
         const cart = AppState.orders[AppState.activeTable];
         if (!cart || cart.length === 0) {
@@ -762,6 +786,12 @@ function renderCart() {
     document.getElementById('print-date').innerText = now.toLocaleString('es-ES');
     document.getElementById('print-table').innerText = tableId.startsWith('Rapida') ? 'Orden Barra' : `Mesa ${tableId}`;
     document.getElementById('print-ticket-id').innerText = `T-${Math.floor(now.getTime() / 1000).toString().slice(-6)}`;
+
+    // v15: Injection of legal info and QR footers
+    const headerLegal = document.getElementById('print-header-legal');
+    const footerTicket = document.getElementById('print-ticket-footer');
+    if (headerLegal) headerLegal.innerHTML = app.getBusinessHeader();
+    if (footerTicket) footerTicket.innerHTML = app.getTicketFooter();
 
     if (cart.length === 0) {
         let label = tableId.startsWith('Rapida') ? 'Nueva orden rápida' : `Mesa ${tableId}`;
