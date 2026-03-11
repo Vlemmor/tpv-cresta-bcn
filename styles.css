@@ -113,7 +113,8 @@ button {
 #clock {
     font-weight: 600;
     color: var(--text-secondary);
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    /* Slightly smaller for mobile v16 */
     white-space: nowrap;
     flex-shrink: 0;
 }
@@ -1169,9 +1170,9 @@ button {
 }
 
 /* =========================================
-   MEDIA QUERIES (TABLET & DESKTOP)
+   MEDIA QUERIES (DESKTOP)
    ========================================= */
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
     .main-content {
         padding-bottom: 0;
     }
